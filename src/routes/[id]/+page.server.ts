@@ -7,18 +7,46 @@ import { sendCampaign, splitRecipients, type Recipient } from '$lib/email/sender
 
 export const load: PageServerLoad = async ({ params }) => {
 	const supabase = getSupabaseClient();
+	const id = params.id;
 
 	const { data: campaign, error: dbError } = await supabase
 		.from('email_campaigns')
 		.select('*')
-		.eq('id', params.id)
+		.eq('id', id)
 		.single();
 
 	if (dbError || !campaign) {
 		throw error(404, 'Campaign not found');
 	}
 
-	return { campaign };
+	// Fetch variants
+	const { data: variants } = await supabase
+		.from('campaign_variants')
+		.select('*')
+		.eq('campaign_id', id)
+		.order('variant_label');
+
+	// Fetch event counts grouped by type
+	const { data: events } = await supabase
+		.from('email_events')
+		.select('event_type, variant_id, is_bot')
+		.eq('campaign_id', id);
+
+	// Aggregate event counts
+	const eventCounts: Record<string, number> = {};
+	const variantEventCounts: Record<string, Record<string, number>> = {};
+	for (const event of events || []) {
+		const type = event.event_type;
+		eventCounts[type] = (eventCounts[type] || 0) + 1;
+
+		if (event.variant_id) {
+			if (!variantEventCounts[event.variant_id]) variantEventCounts[event.variant_id] = {};
+			variantEventCounts[event.variant_id][type] =
+				(variantEventCounts[event.variant_id][type] || 0) + 1;
+		}
+	}
+
+	return { campaign, variants: variants || [], eventCounts, variantEventCounts };
 };
 
 export const actions: Actions = {

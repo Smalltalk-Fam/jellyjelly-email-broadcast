@@ -8,6 +8,52 @@
 	const progress = $derived(
 		c.total_recipients > 0 ? Math.round((c.total_sent / c.total_recipients) * 100) : 0
 	);
+
+	const delivered = $derived(data.eventCounts['delivered'] || 0);
+	const opened = $derived(data.eventCounts['opened'] || 0);
+	const clicked = $derived(data.eventCounts['clicked'] || 0);
+	const bounced = $derived(data.eventCounts['bounced'] || 0);
+	const unsubscribed = $derived(data.eventCounts['unsubscribed'] || 0);
+	const complained = $derived(data.eventCounts['complained'] || 0);
+
+	const openRate = $derived(delivered > 0 ? ((opened / delivered) * 100).toFixed(1) : '0.0');
+	const clickRate = $derived(delivered > 0 ? ((clicked / delivered) * 100).toFixed(1) : '0.0');
+
+	function variantRate(variantId: string, eventType: string): string {
+		const counts = data.variantEventCounts[variantId];
+		if (!counts) return '0.0';
+		const del = counts['delivered'] || 0;
+		const val = counts[eventType] || 0;
+		return del > 0 ? ((val / del) * 100).toFixed(1) : '0.0';
+	}
+
+	function variantCount(variantId: string, eventType: string): number {
+		return data.variantEventCounts[variantId]?.[eventType] || 0;
+	}
+
+	function findWinner(eventType: string): string {
+		if (!data.variants || data.variants.length < 2) return '\u2014';
+		let bestRate = -1;
+		let bestLabel = '';
+		let tie = false;
+		for (const v of data.variants) {
+			const counts = data.variantEventCounts[v.id];
+			const del = counts?.['delivered'] || 0;
+			const val = counts?.[eventType] || 0;
+			const rate = del > 0 ? val / del : 0;
+			if (rate > bestRate) {
+				bestRate = rate;
+				bestLabel = v.variant_label;
+				tie = false;
+			} else if (rate === bestRate) {
+				tie = true;
+			}
+		}
+		return tie ? '\u2014' : bestLabel;
+	}
+
+	const openWinner = $derived(findWinner('opened'));
+	const clickWinner = $derived(findWinner('clicked'));
 </script>
 
 <svelte:head>
@@ -30,8 +76,8 @@
 		</span>
 	</div>
 
-	<!-- Stats -->
-	<div class="stats-grid">
+	<!-- Send Stats -->
+	<div class="stats-grid four-col">
 		<div class="stat">
 			<span class="stat-value">{c.total_recipients}</span>
 			<span class="stat-label">Recipients</span>
@@ -46,9 +92,122 @@
 		</div>
 		<div class="stat">
 			<span class="stat-value">{progress}%</span>
-			<span class="stat-label">Delivered</span>
+			<span class="stat-label">Progress</span>
 		</div>
 	</div>
+
+	<!-- Engagement Metrics -->
+	{#if c.status !== 'draft'}
+		<h2>Engagement Metrics</h2>
+		<div class="stats-grid four-col">
+			<div class="stat">
+				<span class="stat-value">{delivered}</span>
+				<span class="stat-label">Delivered</span>
+			</div>
+			<div class="stat">
+				<span class="stat-value accent">{opened}</span>
+				<span class="stat-label">Opened</span>
+			</div>
+			<div class="stat">
+				<span class="stat-value accent">{clicked}</span>
+				<span class="stat-label">Clicked</span>
+			</div>
+			<div class="stat">
+				<span class="stat-value" class:has-failures={bounced > 0}>{bounced}</span>
+				<span class="stat-label">Bounced</span>
+			</div>
+		</div>
+		<div class="stats-grid four-col">
+			<div class="stat">
+				<span class="stat-value accent">{openRate}%</span>
+				<span class="stat-label">Open Rate</span>
+			</div>
+			<div class="stat">
+				<span class="stat-value accent">{clickRate}%</span>
+				<span class="stat-label">Click Rate</span>
+			</div>
+			<div class="stat">
+				<span class="stat-value" class:has-failures={unsubscribed > 0}>{unsubscribed}</span>
+				<span class="stat-label">Unsubscribed</span>
+			</div>
+			<div class="stat">
+				<span class="stat-value" class:has-failures={complained > 0}>{complained}</span>
+				<span class="stat-label">Complaints</span>
+			</div>
+		</div>
+	{/if}
+
+	<!-- A/B Comparison Table -->
+	{#if data.variants && data.variants.length > 1}
+		<section class="ab-comparison">
+			<h2>A/B Test Results</h2>
+			<div class="table-wrap">
+				<table>
+					<thead>
+						<tr>
+							<th>Metric</th>
+							{#each data.variants as variant}
+								<th>Variant {variant.variant_label}</th>
+							{/each}
+							<th>Winner</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr>
+							<td>Subject</td>
+							{#each data.variants as variant}
+								<td class="subject-cell">{variant.subject}</td>
+							{/each}
+							<td class="winner">&mdash;</td>
+						</tr>
+						<tr>
+							<td>Recipients</td>
+							{#each data.variants as variant}
+								<td>{variant.total_recipients || 0}</td>
+							{/each}
+							<td class="winner">&mdash;</td>
+						</tr>
+						<tr>
+							<td>Delivered</td>
+							{#each data.variants as variant}
+								<td>{variantCount(variant.id, 'delivered')}</td>
+							{/each}
+							<td class="winner">&mdash;</td>
+						</tr>
+						<tr>
+							<td>Open Rate</td>
+							{#each data.variants as variant}
+								<td>{variantRate(variant.id, 'opened')}%</td>
+							{/each}
+							<td class="winner" class:winner-highlight={openWinner !== '\u2014'}>{openWinner}</td>
+						</tr>
+						<tr>
+							<td>Click Rate</td>
+							{#each data.variants as variant}
+								<td>{variantRate(variant.id, 'clicked')}%</td>
+							{/each}
+							<td class="winner" class:winner-highlight={clickWinner !== '\u2014'}>{clickWinner}</td>
+						</tr>
+						<tr>
+							<td>Bounces</td>
+							{#each data.variants as variant}
+								<td>{variantCount(variant.id, 'bounced')}</td>
+							{/each}
+							<td class="winner">&mdash;</td>
+						</tr>
+						<tr>
+							<td>Unsubscribes</td>
+							{#each data.variants as variant}
+								<td>{variantCount(variant.id, 'unsubscribed')}</td>
+							{/each}
+							<td class="winner">&mdash;</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+			<p class="ab-note">Statistical significance requires 100+ recipients per variant.</p>
+		</section>
+	{/if}
 
 	<!-- Send button for drafts -->
 	{#if c.status === 'draft'}
@@ -149,12 +308,15 @@
 	}
 	.stats-grid {
 		display: grid;
-		grid-template-columns: repeat(4, 1fr);
 		gap: 16px;
-		margin-bottom: 32px;
+		margin-bottom: 16px;
+	}
+	.four-col {
+		grid-template-columns: repeat(4, 1fr);
 	}
 	.stat {
 		background: #1a1a2e;
+		border: 1px solid #2a2a3e;
 		padding: 20px;
 		border-radius: 12px;
 		text-align: center;
@@ -164,6 +326,9 @@
 		font-size: 28px;
 		font-weight: 700;
 		color: #fff;
+	}
+	.stat-value.accent {
+		color: #89a9f4;
 	}
 	.stat-label {
 		display: block;
@@ -175,6 +340,62 @@
 	.has-failures {
 		color: #ef4444;
 	}
+
+	/* A/B Comparison */
+	.ab-comparison {
+		margin-top: 32px;
+		margin-bottom: 32px;
+	}
+	.table-wrap {
+		overflow-x: auto;
+	}
+	table {
+		width: 100%;
+		border-collapse: collapse;
+		background: #1a1a2e;
+		border-radius: 12px;
+		overflow: hidden;
+	}
+	th,
+	td {
+		padding: 12px 16px;
+		text-align: left;
+		border-bottom: 1px solid #2a2a3e;
+		color: #e0e0e0;
+		font-size: 14px;
+	}
+	th {
+		background: #12122a;
+		font-weight: 600;
+		color: #aaa;
+		text-transform: uppercase;
+		font-size: 12px;
+	}
+	tr:last-child td {
+		border-bottom: none;
+	}
+	.subject-cell {
+		max-width: 200px;
+		overflow: hidden;
+		text-overflow: ellipsis;
+		white-space: nowrap;
+	}
+	.winner {
+		color: #888;
+		font-weight: 500;
+	}
+	.winner-highlight {
+		color: #89a9f4;
+		font-weight: 600;
+	}
+	.ab-note {
+		margin-top: 12px;
+		font-size: 13px;
+		color: #666;
+		font-style: italic;
+	}
+
+	/* Send section */
 	.send-section {
 		background: #1a1a2e;
 		padding: 24px;
