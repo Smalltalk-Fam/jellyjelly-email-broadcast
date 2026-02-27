@@ -88,7 +88,7 @@ export const actions: Actions = {
 				const name = path.split('/').pop()?.replace('.html', '') || '';
 				templateMap[name] = content as string;
 			}
-			templateHtml = templateMap[campaign.template_name] || templateMap['default'];
+			templateHtml = templateMap[campaign.template_name] || templateMap['announcement'];
 			if (!templateHtml) {
 				return fail(500, { error: 'Email template not found.' });
 			}

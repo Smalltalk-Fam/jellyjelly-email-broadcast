@@ -5,7 +5,7 @@
 
 	let subject = $state('');
 	let bodyHtml = $state('');
-	let templateName = $state('default');
+	let templateName = $state('announcement');
 	let aiPrompt = $state('');
 	let aiLoading = $state(false);
 	let aiError = $state('');

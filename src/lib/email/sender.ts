@@ -30,11 +30,19 @@ export function batchArray<T>(items: T[], size: number): T[][] {
 	return batches;
 }
 
-/** Inject body and unsubscribe URL into template HTML */
-export function buildEmailHtml(template: string, body: string, unsubscribeUrl: string): string {
+/** Inject body, unsubscribe URL, subject, and preheader into template HTML */
+export function buildEmailHtml(
+	template: string,
+	body: string,
+	unsubscribeUrl: string,
+	subject?: string,
+	preheader?: string
+): string {
 	return template
 		.replace(/\{\{body\}\}/g, body)
-		.replace(/\{\{unsubscribe_url\}\}/g, unsubscribeUrl);
+		.replace(/\{\{unsubscribe_url\}\}/g, unsubscribeUrl)
+		.replace(/\{\{subject\}\}/g, subject || '')
+		.replace(/\{\{preheader\}\}/g, preheader || '');
 }
 
 function sleep(ms: number): Promise<void> {
@@ -67,7 +75,7 @@ export async function sendCampaign(
 			batch.map(async (recipient) => {
 				const token = createUnsubscribeToken(recipient.email, campaignId, unsubscribeSecret);
 				const unsubscribeUrl = `${siteUrl}/unsubscribe?token=${encodeURIComponent(token)}`;
-				const html = buildEmailHtml(templateHtml, bodyHtml, unsubscribeUrl);
+				const html = buildEmailHtml(templateHtml, bodyHtml, unsubscribeUrl, subject);
 
 				return mailgun.send({
 					to: recipient.email,

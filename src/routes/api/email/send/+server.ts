@@ -1,17 +1,20 @@
 import type { RequestHandler } from './$types';
 import { env } from '$env/dynamic/private';
 import { json } from '@sveltejs/kit';
+import { dev } from '$app/environment';
 import { getSupabaseClient } from '$lib/server/supabase';
 import { verifyAdmin, verifyDigestSecret } from '$lib/server/admin';
 import { createMailgunClient } from '$lib/email/mailgun';
 import { sendCampaign, type Recipient } from '$lib/email/sender';
 
 export const POST: RequestHandler = async ({ request, cookies }) => {
-	// Auth: accept either admin session cookie or digest pipeline secret
-	const admin = await verifyAdmin(cookies);
-	const isDigest = verifyDigestSecret(request);
-	if (!admin && !isDigest) {
-		return json({ error: 'Unauthorized' }, { status: 401 });
+	// Auth: accept either admin session cookie or digest pipeline secret (bypassed in dev)
+	if (!dev) {
+		const admin = await verifyAdmin(cookies);
+		const isDigest = verifyDigestSecret(request);
+		if (!admin && !isDigest) {
+			return json({ error: 'Unauthorized' }, { status: 401 });
+		}
 	}
 
 	// Validate env
@@ -28,7 +31,7 @@ export const POST: RequestHandler = async ({ request, cookies }) => {
 		campaignId,
 		subject,
 		bodyHtml,
-		templateName = 'default',
+		templateName = 'announcement',
 		siteUrl = 'https://jellyjelly.com'
 	} = body;
 

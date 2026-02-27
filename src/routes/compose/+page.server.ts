@@ -19,7 +19,7 @@ export const actions: Actions = {
 		const formData = await request.formData();
 		const subject = formData.get('subject') as string;
 		const bodyHtml = formData.get('bodyHtml') as string;
-		const templateName = (formData.get('templateName') as string) || 'default';
+		const templateName = (formData.get('templateName') as string) || 'announcement';
 
 		if (!subject || !bodyHtml) {
 			return fail(400, { error: 'Subject and body are required.' });
