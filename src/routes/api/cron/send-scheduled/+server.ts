@@ -5,6 +5,7 @@ import { json } from '@sveltejs/kit';
 import { getSupabaseClient } from '$lib/server/supabase';
 import { createMailgunClient } from '$lib/email/mailgun';
 import { sendCampaign, type Recipient } from '$lib/email/sender';
+import { checkUserActivity } from '$lib/server/jelly-api';
 
 export const GET: RequestHandler = async ({ request }) => {
 	// Auth: verify CRON_SECRET via Bearer token (skip in dev mode)
@@ -192,6 +193,40 @@ export const GET: RequestHandler = async ({ request }) => {
 				.update({ status: 'failed' })
 				.eq('id', campaign.id);
 			results.push({ campaignId: campaign.id, status: 'failed' });
+		}
+	}
+
+	// Check re-engagement outcomes (7d and 30d activity)
+	const { data: pendingOutcomes } = await supabase
+		.from('reengagement_outcomes')
+		.select('*')
+		.not('clicked_at', 'is', null)
+		.or('active_7d.is.null,active_30d.is.null');
+
+	if (pendingOutcomes && pendingOutcomes.length > 0) {
+		for (const outcome of pendingOutcomes) {
+			const clickedAt = new Date(outcome.clicked_at);
+			const now = new Date();
+			const daysSinceClick = (now.getTime() - clickedAt.getTime()) / 86400000;
+
+			if (daysSinceClick >= 7 && outcome.active_7d == null) {
+				const activity = await checkUserActivity(outcome.user_id);
+				await supabase
+					.from('reengagement_outcomes')
+					.update({ active_7d: activity.active, returned_at: activity.lastActiveAt })
+					.eq('id', outcome.id);
+			}
+
+			if (daysSinceClick >= 30 && outcome.active_30d == null) {
+				const activity = await checkUserActivity(outcome.user_id);
+				await supabase
+					.from('reengagement_outcomes')
+					.update({
+						active_30d: activity.active,
+						relapsed: outcome.active_7d === true && !activity.active
+					})
+					.eq('id', outcome.id);
+			}
 		}
 	}
 

@@ -68,5 +68,35 @@ export const POST: RequestHandler = async ({ request }) => {
 		console.error('Failed to store email event:', error);
 	}
 
+	// Track click events for re-engagement outcomes
+	if (eventType === 'clicked' && campaignId) {
+		const { data: campaign } = await supabase
+			.from('email_campaigns')
+			.select('sequence_id')
+			.eq('id', campaignId)
+			.single();
+
+		if (campaign?.sequence_id) {
+			// Check if outcome already exists for this email + sequence
+			const { data: existing } = await supabase
+				.from('reengagement_outcomes')
+				.select('id')
+				.eq('email', recipient)
+				.eq('sequence_id', campaign.sequence_id)
+				.maybeSingle();
+
+			if (!existing) {
+				await supabase.from('reengagement_outcomes').insert({
+					campaign_id: campaignId,
+					sequence_id: campaign.sequence_id,
+					variant_id: variantId,
+					user_id: recipient,
+					email: recipient,
+					clicked_at: timestamp
+				});
+			}
+		}
+	}
+
 	return json({ success: true });
 };
