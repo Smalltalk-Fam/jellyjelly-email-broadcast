@@ -3,7 +3,7 @@ import { env } from '$env/dynamic/private';
 import { error, fail } from '@sveltejs/kit';
 import { getSupabaseClient } from '$lib/server/supabase';
 import { createMailgunClient } from '$lib/email/mailgun';
-import { sendCampaign, type Recipient } from '$lib/email/sender';
+import { sendCampaign, splitRecipients, type Recipient } from '$lib/email/sender';
 
 export const load: PageServerLoad = async ({ params }) => {
 	const supabase = getSupabaseClient();
@@ -106,47 +106,137 @@ export const actions: Actions = {
 			})
 			.eq('id', campaign.id);
 
-		// Send in batches
-		const result = await sendCampaign(
-			mailgun,
-			recipients,
-			{
-				campaignId: campaign.id,
-				subject: campaign.subject,
-				bodyHtml: campaign.body_html,
-				templateHtml
-			},
-			unsubscribeSecret,
-			siteUrl,
-			async (progress) => {
-				await supabase
-					.from('email_campaigns')
-					.update({
-						total_sent: progress.totalSent,
-						total_failed: progress.totalFailed
-					})
-					.eq('id', campaign.id);
+		// Check for A/B variants
+		const { data: variants } = await supabase
+			.from('campaign_variants')
+			.select('*')
+			.eq('campaign_id', campaign.id)
+			.order('variant_label', { ascending: true });
+
+		let totalSent = 0;
+		let totalFailed = 0;
+		const totalRecipients = recipients.length;
+
+		if (variants && variants.length >= 2) {
+			// A/B variant sending
+			const variantA = variants.find((v) => v.variant_label === 'A')!;
+			const variantB = variants.find((v) => v.variant_label === 'B')!;
+
+			const { groupA, groupB } = splitRecipients(recipients, variantA.split_percentage);
+
+			// Load variant-specific templates
+			const allTemplates = import.meta.glob('/src/lib/email-templates/*.html', {
+				query: '?raw',
+				import: 'default',
+				eager: true
+			});
+			const variantTemplateMap: Record<string, string> = {};
+			for (const [path, content] of Object.entries(allTemplates)) {
+				const name = path.split('/').pop()?.replace('.html', '') || '';
+				variantTemplateMap[name] = content as string;
 			}
-		);
+
+			const templateA = variantTemplateMap[variantA.template_name] || templateHtml;
+			const templateB = variantTemplateMap[variantB.template_name] || templateHtml;
+
+			// Send to group A
+			const resultA = await sendCampaign(
+				mailgun,
+				groupA,
+				{
+					campaignId: campaign.id,
+					subject: variantA.subject,
+					bodyHtml: variantA.body_html,
+					templateHtml: templateA,
+					tags: ['campaign', `campaign-${campaign.id}`, 'variant-A']
+				},
+				unsubscribeSecret,
+				siteUrl
+			);
+
+			// Update variant A stats
+			await supabase
+				.from('campaign_variants')
+				.update({
+					total_recipients: groupA.length,
+					total_sent: resultA.totalSent,
+					total_failed: resultA.totalFailed
+				})
+				.eq('id', variantA.id);
+
+			// Send to group B
+			const resultB = await sendCampaign(
+				mailgun,
+				groupB,
+				{
+					campaignId: campaign.id,
+					subject: variantB.subject,
+					bodyHtml: variantB.body_html,
+					templateHtml: templateB,
+					tags: ['campaign', `campaign-${campaign.id}`, 'variant-B']
+				},
+				unsubscribeSecret,
+				siteUrl
+			);
+
+			// Update variant B stats
+			await supabase
+				.from('campaign_variants')
+				.update({
+					total_recipients: groupB.length,
+					total_sent: resultB.totalSent,
+					total_failed: resultB.totalFailed
+				})
+				.eq('id', variantB.id);
+
+			totalSent = resultA.totalSent + resultB.totalSent;
+			totalFailed = resultA.totalFailed + resultB.totalFailed;
+		} else {
+			// Normal sending (no variants)
+			const result = await sendCampaign(
+				mailgun,
+				recipients,
+				{
+					campaignId: campaign.id,
+					subject: campaign.subject,
+					bodyHtml: campaign.body_html,
+					templateHtml,
+					tags: ['campaign', `campaign-${campaign.id}`]
+				},
+				unsubscribeSecret,
+				siteUrl,
+				async (progress) => {
+					await supabase
+						.from('email_campaigns')
+						.update({
+							total_sent: progress.totalSent,
+							total_failed: progress.totalFailed
+						})
+						.eq('id', campaign.id);
+				}
+			);
+
+			totalSent = result.totalSent;
+			totalFailed = result.totalFailed;
+		}
 
 		// Mark campaign complete
-		const finalStatus =
-			result.totalFailed === result.totalRecipients ? 'failed' : 'completed';
+		const finalStatus = totalFailed === totalRecipients ? 'failed' : 'completed';
 		await supabase
 			.from('email_campaigns')
 			.update({
 				status: finalStatus,
-				total_sent: result.totalSent,
-				total_failed: result.totalFailed,
+				total_sent: totalSent,
+				total_failed: totalFailed,
 				completed_at: new Date().toISOString()
 			})
 			.eq('id', campaign.id);
 
 		return {
 			sent: true,
-			totalRecipients: result.totalRecipients,
-			totalSent: result.totalSent,
-			totalFailed: result.totalFailed
+			totalRecipients,
+			totalSent,
+			totalFailed
 		};
 	}
 };

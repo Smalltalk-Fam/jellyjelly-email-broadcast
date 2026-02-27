@@ -13,6 +13,7 @@ export interface CampaignConfig {
 	templateHtml: string;
 	batchSize?: number;
 	delayMs?: number;
+	tags?: string[];
 }
 
 export interface SendProgress {
@@ -58,7 +59,7 @@ export async function sendCampaign(
 	siteUrl: string,
 	onProgress?: (progress: SendProgress) => void
 ): Promise<SendProgress> {
-	const { campaignId, subject, bodyHtml, templateHtml, batchSize = 50, delayMs = 1000 } = config;
+	const { campaignId, subject, bodyHtml, templateHtml, batchSize = 50, delayMs = 1000, tags } = config;
 
 	const progress: SendProgress = {
 		totalSent: 0,
@@ -81,7 +82,7 @@ export async function sendCampaign(
 					to: recipient.email,
 					subject,
 					html,
-					tags: ['campaign', `campaign-${campaignId}`],
+					tags: tags || ['campaign', `campaign-${campaignId}`],
 					headers: {
 						'List-Unsubscribe': `<${unsubscribeUrl}>`,
 						'List-Unsubscribe-Post': 'List-Unsubscribe=One-Click'
@@ -106,4 +107,21 @@ export async function sendCampaign(
 	}
 
 	return progress;
+}
+
+/** Shuffle recipients and split into two groups by percentage (Fisher-Yates shuffle) */
+export function splitRecipients(
+	recipients: Recipient[],
+	splitPercentageA: number
+): { groupA: Recipient[]; groupB: Recipient[] } {
+	const shuffled = [...recipients];
+	for (let i = shuffled.length - 1; i > 0; i--) {
+		const j = Math.floor(Math.random() * (i + 1));
+		[shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+	}
+	const splitIndex = Math.round(shuffled.length * (splitPercentageA / 100));
+	return {
+		groupA: shuffled.slice(0, splitIndex),
+		groupB: shuffled.slice(splitIndex)
+	};
 }
