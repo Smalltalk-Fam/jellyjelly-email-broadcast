@@ -22,6 +22,7 @@
 		"vitest": "^4.0.18"
 	},
 	"dependencies": {
+		"@anthropic-ai/bedrock-sdk": "^0.26.4",
 		"@anthropic-ai/sdk": "^0.74.0",
 		"@supabase/supabase-js": "^2.90.1"
 	}

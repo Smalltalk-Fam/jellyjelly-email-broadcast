@@ -107,11 +107,12 @@ export function createMailgunClient(apiKey: string, domain: string) {
 			const typeLabel = type.slice(0, -1) as SuppressionEntry['type'];
 			let url: string | null = `${domainUrl}/${type}?limit=1000`;
 			while (url) {
-				const res = await fetch(url, {
+				const res: Response = await fetch(url, {
 					headers: { Authorization: `Basic ${auth}` }
 				});
 				if (!res.ok) break;
-				const data = await res.json();
+				// eslint-disable-next-line @typescript-eslint/no-explicit-any
+			const data: { items?: any[]; paging?: { next?: string } } = await res.json();
 				const items = data.items || [];
 				for (const item of items) {
 					all.push({
