@@ -14,6 +14,9 @@ export interface CampaignConfig {
 	batchSize?: number;
 	delayMs?: number;
 	tags?: string[];
+	sequenceId?: string;
+	sequenceStep?: number;
+	variantLabel?: string;
 }
 
 export interface SendProgress {
@@ -59,7 +62,19 @@ export async function sendCampaign(
 	siteUrl: string,
 	onProgress?: (progress: SendProgress) => void
 ): Promise<SendProgress> {
-	const { campaignId, subject, bodyHtml, templateHtml, batchSize = 50, delayMs = 1000, tags } = config;
+	const { campaignId, subject, bodyHtml, templateHtml, batchSize = 50, delayMs = 1000, tags, sequenceId, sequenceStep, variantLabel } = config;
+
+	// Build tags: explicit tags take priority, otherwise build from config fields
+	const resolvedTags: string[] = tags ? [...tags] : [`campaign-${campaignId}`];
+	if (sequenceId && !resolvedTags.some((t) => t.startsWith('sequence-'))) {
+		resolvedTags.push(`sequence-${sequenceId}`);
+	}
+	if (sequenceStep != null && !resolvedTags.some((t) => t.startsWith('step-'))) {
+		resolvedTags.push(`step-${sequenceStep}`);
+	}
+	if (variantLabel && !resolvedTags.some((t) => t.startsWith('variant-'))) {
+		resolvedTags.push(`variant-${variantLabel}`);
+	}
 
 	const progress: SendProgress = {
 		totalSent: 0,
@@ -82,7 +97,7 @@ export async function sendCampaign(
 					to: recipient.email,
 					subject,
 					html,
-					tags: tags || ['campaign', `campaign-${campaignId}`],
+					tags: resolvedTags,
 					headers: {
 						'List-Unsubscribe': `<${unsubscribeUrl}>`,
 						'List-Unsubscribe-Post': 'List-Unsubscribe=One-Click'
