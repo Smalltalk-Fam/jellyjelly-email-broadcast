@@ -17,7 +17,12 @@ export interface CampaignConfig {
 	sequenceId?: string;
 	sequenceStep?: number;
 	variantLabel?: string;
+	preheader?: string;
 	ctaUrl?: string;
+	bgColor?: string;
+	btnColor?: string;
+	headingColor?: string;
+	bodyColor?: string;
 }
 
 export interface SendProgress {
@@ -35,21 +40,51 @@ export function batchArray<T>(items: T[], size: number): T[][] {
 	return batches;
 }
 
-/** Inject body, unsubscribe URL, subject, preheader, and CTA URL into template HTML */
+/** Auto-compute contrasting text color for a given background hex */
+function contrastColor(hex: string): string {
+	const r = parseInt(hex.slice(1, 3), 16);
+	const g = parseInt(hex.slice(3, 5), 16);
+	const b = parseInt(hex.slice(5, 7), 16);
+	const luminance = (0.299 * r + 0.587 * g + 0.114 * b) / 255;
+	return luminance > 0.5 ? '#1a1731' : '#F8F9FF';
+}
+
+function isLightColor(hex: string): boolean {
+	const r = parseInt(hex.slice(1, 3), 16);
+	const g = parseInt(hex.slice(3, 5), 16);
+	const b = parseInt(hex.slice(5, 7), 16);
+	return (0.299 * r + 0.587 * g + 0.114 * b) / 255 > 0.5;
+}
+
+/** Inject body, unsubscribe URL, subject, preheader, CTA URL, and color tokens into template HTML */
 export function buildEmailHtml(
 	template: string,
 	body: string,
 	unsubscribeUrl: string,
 	subject?: string,
 	preheader?: string,
-	ctaUrl?: string
+	ctaUrl?: string,
+	bgColor?: string,
+	btnColor?: string,
+	headingColor?: string,
+	bodyColor?: string
 ): string {
+	const resolvedBtnColor = btnColor || '#89A9F4';
+	const resolvedBgColor = bgColor || '#1a1731';
 	return template
 		.replace(/\{\{body\}\}/g, body)
 		.replace(/\{\{unsubscribe_url\}\}/g, unsubscribeUrl)
 		.replace(/\{\{subject\}\}/g, subject || '')
 		.replace(/\{\{preheader\}\}/g, preheader || '')
-		.replace(/\{\{cta_url\}\}/g, ctaUrl || 'https://jellyjelly.com');
+		.replace(/\{\{cta_url\}\}/g, ctaUrl || 'https://jellyjelly.com')
+		.replace(/\{\{bg_color\}\}/g, resolvedBgColor)
+		.replace(/\{\{btn_color\}\}/g, resolvedBtnColor)
+		.replace(/\{\{btn_text_color\}\}/g, contrastColor(resolvedBtnColor))
+		.replace(/\{\{heading_color\}\}/g, headingColor || '#F8F9FF')
+		.replace(/\{\{body_color\}\}/g, bodyColor || '#F8F9FF')
+		.replace(/\{\{logo_src\}\}/g, isLightColor(resolvedBgColor)
+			? 'https://static1.jellyjelly.com/jelly-logo-blue.png'
+			: 'https://static1.jellyjelly.com/jelly-logo-white.png');
 }
 
 function sleep(ms: number): Promise<void> {
@@ -65,7 +100,7 @@ export async function sendCampaign(
 	siteUrl: string,
 	onProgress?: (progress: SendProgress) => void
 ): Promise<SendProgress> {
-	const { campaignId, subject, bodyHtml, templateHtml, batchSize = 50, delayMs = 1000, tags, sequenceId, sequenceStep, variantLabel, ctaUrl } = config;
+	const { campaignId, subject, bodyHtml, templateHtml, batchSize = 50, delayMs = 1000, tags, sequenceId, sequenceStep, variantLabel, preheader, ctaUrl, bgColor, btnColor, headingColor, bodyColor } = config;
 
 	// Build tags: explicit tags take priority, otherwise build from config fields
 	const resolvedTags: string[] = tags ? [...tags] : [`campaign-${campaignId}`];
@@ -94,7 +129,7 @@ export async function sendCampaign(
 			batch.map(async (recipient) => {
 				const token = createUnsubscribeToken(recipient.email, campaignId, unsubscribeSecret);
 				const unsubscribeUrl = `${siteUrl}/unsubscribe?token=${encodeURIComponent(token)}`;
-				const html = buildEmailHtml(templateHtml, bodyHtml, unsubscribeUrl, subject, undefined, ctaUrl);
+				const html = buildEmailHtml(templateHtml, bodyHtml, unsubscribeUrl, subject, preheader, ctaUrl, bgColor, btnColor, headingColor, bodyColor);
 
 				return mailgun.send({
 					to: recipient.email,
