@@ -19,16 +19,15 @@
 	let splitRatio = $state('50');
 
 	// Build full preview by injecting body into the selected template
-	let previewSrc = $derived.by(() => {
+	let previewHtml = $derived.by(() => {
 		const tpl = data.templateMap?.[templateName] || '';
 		if (!tpl) return '';
-		const filled = tpl
+		return tpl
 			.replace('{{body}}', bodyHtml || '<p style="color:#ffffff; opacity:0.5;">Your email content will appear here...</p>')
 			.replace('{{subject}}', subject || 'Preview')
 			.replace('{{preheader}}', '')
 			.replace('{{unsubscribe_url}}', '#')
 			.replace('{{cta_url}}', ctaUrl || 'https://jellyjelly.com');
-		return 'data:text/html;charset=utf-8,' + encodeURIComponent(filled);
 	});
 
 	async function aiGenerate(mode: 'generate' | 'refine') {
@@ -200,9 +199,9 @@
 			<div class="preview-panel">
 				<span class="panel-label">Preview — {data.templateInfo.find(t => t.name === templateName)?.label || templateName}</span>
 				<div class="preview-frame">
-					{#if previewSrc}
+					{#if previewHtml}
 						<iframe
-							src={previewSrc}
+							srcdoc={previewHtml}
 							title="Email Preview"
 							sandbox="allow-same-origin"
 							style="width:100%; height:100%; border:none; min-height:600px; background:#4469B7; border-radius:8px;"
