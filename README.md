@@ -12,18 +12,23 @@ Admin tool for composing and sending mass email campaigns to JellyJelly users. B
 - **CAN-SPAM Compliant** — HMAC-signed unsubscribe tokens, physical address in footer, one-click unsubscribe headers
 - **Unsubscribe via Mailgun** — All unsubscribes go through Mailgun's suppression API and are auto-excluded from future sends
 
-### Email Templates (6 Pre-built)
+### Email Templates (11 Pre-built)
 
-All templates match the established JellyJelly email brand from the notification emails (`#4469B7` blue background, Roboto font, white text, `#89A9F4` rounded CTA buttons):
+All templates match the established JellyJelly email brand from the notification emails (`#4469B7` blue background, Roboto font, white text, `#89A9F4` rounded CTA buttons). CTA buttons use `{{cta_url}}` placeholders — set a custom link per campaign or default to `https://jellyjelly.com`.
 
 | Template | Use Case | Key Feature |
 |---|---|---|
 | **Announcement** | Feature launches, app updates | Bold "BIG NEWS!" heading, single CTA |
-| **Weekly Digest** | Content roundups, trending highlights | 3 video thumbnail blocks with play buttons |
+| **Weekly Digest** | Content roundups, trending highlights | "THIS WEEK ON JELLYJELLY" heading |
 | **Product Spotlight** | Showcasing features/content | Large feature image (600x338) with play overlay |
 | **Event Invite** | Livestreams, AMAs, community events | Styled event details quote box |
 | **Re-engagement** | Value-Proof winback campaigns | 1-3 feature update blocks with before/after framing |
 | **Minimal** | Personal notes, founder updates | Logo + plain text, no heavy design |
+| **Glass** | Dark glassmorphism | Frosted card with blur backdrop |
+| **Tactile** | Neo-brutalist | Bold borders and shadows |
+| **Newsletter** | Editorial style | Serif typography |
+| **Noir** | Dark cinematic | Gold accents on dark background |
+| **Gradient** | Vibrant mesh | Gradient mesh background |
 
 ### Re-engagement Campaign Builder
 
@@ -210,11 +215,16 @@ src/
 │   │   └── ai-compose.ts         # AI email generation via Claude
 │   ├── email-templates/
 │   │   ├── announcement.html     # Bold announcement template
-│   │   ├── digest.html           # Weekly digest with video thumbnails
+│   │   ├── digest.html           # Weekly digest with "THIS WEEK" heading
 │   │   ├── spotlight.html        # Product/feature spotlight
 │   │   ├── event.html            # Event invite with details box
 │   │   ├── reengagement.html     # Value-Proof winback template
-│   │   └── minimal.html          # Plain-text-feel personal note
+│   │   ├── minimal.html          # Plain-text-feel personal note
+│   │   ├── glass.html            # Dark glassmorphism with frosted card
+│   │   ├── tactile.html          # Neo-brutalist with bold borders
+│   │   ├── newsletter.html       # Editorial style with serif typography
+│   │   ├── noir.html             # Dark cinematic with gold accents
+│   │   └── gradient.html         # Vibrant gradient mesh background
 │   └── server/
 │       ├── supabase.ts           # Supabase client singleton
 │       ├── admin.ts              # Admin auth (cookie + digest secret)
@@ -266,7 +276,16 @@ Configured for Vercel via `@sveltejs/adapter-vercel`. Push to deploy.
 
 Vercel Cron required for sequence scheduling (check `scheduled_at` campaigns every 6 hours).
 
+## Weekly Digest Integration
+
+The [jellyjelly-weekly-digest](https://github.com/Smalltalk-Fam/jellyjelly-weekly-digest) bot sends weekly digest emails via this tool's `/api/email/send` endpoint using `DIGEST_API_SECRET` for auth. The digest generates body content HTML and the broadcast system wraps it in the branded `digest` template with proper unsubscribe tokens, List-Unsubscribe headers, suppression filtering, rate limiting, and campaign tracking.
+
+**Required setup**: Set the same `DIGEST_API_SECRET` value in both:
+- This project's `.env` (or Vercel env vars)
+- The weekly digest repo's GitHub Actions secrets
+
 ## Related
 
-- [jellyjelly-weekly-digest](https://github.com/Smalltalk-Fam/jellyjelly-weekly-digest) — Automated weekly digest bot that triggers email sends via this tool's API
+- [jellyjelly-weekly-digest](https://github.com/Smalltalk-Fam/jellyjelly-weekly-digest) — Automated weekly digest bot that sends emails via this tool's API
+- [jellyjelly-website](https://github.com/Smalltalk-Fam/jellyjelly-website) — Production deployment (admin broadcast routes live at `jellyjelly.com/admin_broadcast`)
 - [jelly-api-legacy](https://github.com/Smalltalk-Fam/jelly-api-legacy) — JellyJelly backend API + existing notification email templates
