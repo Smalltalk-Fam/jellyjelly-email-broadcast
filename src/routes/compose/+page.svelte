@@ -6,6 +6,7 @@
 	let subject = $state('');
 	let bodyHtml = $state('');
 	let templateName = $state('announcement');
+	let ctaUrl = $state('');
 	let aiPrompt = $state('');
 	let aiLoading = $state(false);
 	let aiError = $state('');
@@ -25,7 +26,8 @@
 			.replace('{{body}}', bodyHtml || '<p style="color:#ffffff; opacity:0.5;">Your email content will appear here...</p>')
 			.replace('{{subject}}', subject || 'Preview')
 			.replace('{{preheader}}', '')
-			.replace('{{unsubscribe_url}}', '#');
+			.replace('{{unsubscribe_url}}', '#')
+			.replace('{{cta_url}}', ctaUrl || 'https://jellyjelly.com');
 		return 'data:text/html;charset=utf-8,' + encodeURIComponent(filled);
 	});
 
@@ -117,6 +119,19 @@
 			</div>
 		</div>
 
+		<!-- CTA Button Link -->
+		<div class="form-group">
+			<label for="ctaUrl">Button Link</label>
+			<input
+				id="ctaUrl"
+				name="ctaUrl"
+				type="url"
+				bind:value={ctaUrl}
+				placeholder="https://jellyjelly.com"
+			/>
+			<span class="field-hint">URL for the template's call-to-action button (RSVP NOW, WATCH NOW, etc.)</span>
+		</div>
+
 		<!-- AI Assist -->
 		<div class="ai-section">
 			<label for="aiPrompt">AI Assist</label>
@@ -152,6 +167,18 @@
 			{/if}
 		</div>
 
+		<!-- A/B Testing Toggle -->
+		<div class="ab-toggle-section">
+			<label class="ab-toggle-label">
+				<input
+					type="checkbox"
+					bind:checked={abEnabled}
+					name="abEnabled"
+				/>
+				<span class="ab-toggle-text">Enable A/B Testing</span>
+			</label>
+		</div>
+
 		<!-- Variant A label (shown when A/B is enabled) -->
 		{#if abEnabled}
 			<div class="variant-label variant-a-label">Variant A</div>
@@ -183,18 +210,6 @@
 					{/if}
 				</div>
 			</div>
-		</div>
-
-		<!-- A/B Testing Section -->
-		<div class="ab-toggle-section">
-			<label class="ab-toggle-label">
-				<input
-					type="checkbox"
-					bind:checked={abEnabled}
-					name="abEnabled"
-				/>
-				<span class="ab-toggle-text">Enable A/B Testing</span>
-			</label>
 		</div>
 
 		{#if abEnabled}
@@ -285,6 +300,26 @@
 		font-weight: 600;
 		text-transform: uppercase;
 		letter-spacing: 0.5px;
+	}
+	input[type='url'] {
+		width: 100%;
+		padding: 12px 16px;
+		background: #111;
+		border: 1px solid #333;
+		border-radius: 10px;
+		color: #e0e0e0;
+		font-size: 14px;
+		font-family: inherit;
+	}
+	input[type='url']:focus {
+		outline: none;
+		border-color: #4469B7;
+	}
+	.field-hint {
+		display: block;
+		margin-top: 6px;
+		font-size: 12px;
+		color: #666;
 	}
 	input[type='text'],
 	select,

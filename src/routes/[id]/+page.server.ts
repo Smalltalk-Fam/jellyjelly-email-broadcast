@@ -176,7 +176,8 @@ export const actions: Actions = {
 					subject: variantA.subject,
 					bodyHtml: variantA.body_html,
 					templateHtml: templateA,
-					tags: ['campaign', `campaign-${campaign.id}`, 'variant-A']
+					tags: ['campaign', `campaign-${campaign.id}`, 'variant-A'],
+					ctaUrl: variantA.cta_url || campaign.cta_url
 				},
 				unsubscribeSecret,
 				siteUrl
@@ -201,7 +202,8 @@ export const actions: Actions = {
 					subject: variantB.subject,
 					bodyHtml: variantB.body_html,
 					templateHtml: templateB,
-					tags: ['campaign', `campaign-${campaign.id}`, 'variant-B']
+					tags: ['campaign', `campaign-${campaign.id}`, 'variant-B'],
+					ctaUrl: variantB.cta_url || campaign.cta_url
 				},
 				unsubscribeSecret,
 				siteUrl
@@ -229,7 +231,8 @@ export const actions: Actions = {
 					subject: campaign.subject,
 					bodyHtml: campaign.body_html,
 					templateHtml,
-					tags: ['campaign', `campaign-${campaign.id}`]
+					tags: ['campaign', `campaign-${campaign.id}`],
+					ctaUrl: campaign.cta_url
 				},
 				unsubscribeSecret,
 				siteUrl,

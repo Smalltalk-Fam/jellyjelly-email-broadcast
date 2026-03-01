@@ -39,6 +39,7 @@ export const actions: Actions = {
 		const subject = formData.get('subject') as string;
 		const bodyHtml = formData.get('bodyHtml') as string;
 		const templateName = (formData.get('templateName') as string) || 'announcement';
+		const ctaUrl = (formData.get('ctaUrl') as string) || null;
 
 		if (!subject || !bodyHtml) {
 			return fail(400, { error: 'Subject and body are required.' });
@@ -54,7 +55,8 @@ export const actions: Actions = {
 				body_html: bodyHtml,
 				body_preview: bodyHtml.replace(/<[^>]*>/g, '').slice(0, 200),
 				sent_by: locals.adminId || null,
-				status: 'draft'
+				status: 'draft',
+				cta_url: ctaUrl
 			})
 			.select()
 			.single();
@@ -79,7 +81,8 @@ export const actions: Actions = {
 				subject,
 				body_html: bodyHtml,
 				template_name: templateName,
-				split_percentage: splitRatio
+				split_percentage: splitRatio,
+				cta_url: ctaUrl
 			});
 
 			if (varAError) {
@@ -93,7 +96,8 @@ export const actions: Actions = {
 				subject: subjectB,
 				body_html: bodyHtmlB,
 				template_name: templateNameB,
-				split_percentage: 100 - splitRatio
+				split_percentage: 100 - splitRatio,
+				cta_url: ctaUrl
 			});
 
 			if (varBError) {

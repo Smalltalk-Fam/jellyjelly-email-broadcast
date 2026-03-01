@@ -111,3 +111,9 @@ CREATE TABLE IF NOT EXISTS public.reengagement_outcomes (
 ALTER TABLE public.reengagement_outcomes ENABLE ROW LEVEL SECURITY;
 CREATE POLICY "Service role access" ON public.reengagement_outcomes
   FOR ALL USING (true) WITH CHECK (true);
+
+-- ============================================================
+-- CTA URL SUPPORT
+-- ============================================================
+ALTER TABLE public.email_campaigns ADD COLUMN IF NOT EXISTS cta_url TEXT;
+ALTER TABLE public.campaign_variants ADD COLUMN IF NOT EXISTS cta_url TEXT;

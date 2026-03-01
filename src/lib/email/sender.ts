@@ -17,6 +17,7 @@ export interface CampaignConfig {
 	sequenceId?: string;
 	sequenceStep?: number;
 	variantLabel?: string;
+	ctaUrl?: string;
 }
 
 export interface SendProgress {
@@ -34,19 +35,21 @@ export function batchArray<T>(items: T[], size: number): T[][] {
 	return batches;
 }
 
-/** Inject body, unsubscribe URL, subject, and preheader into template HTML */
+/** Inject body, unsubscribe URL, subject, preheader, and CTA URL into template HTML */
 export function buildEmailHtml(
 	template: string,
 	body: string,
 	unsubscribeUrl: string,
 	subject?: string,
-	preheader?: string
+	preheader?: string,
+	ctaUrl?: string
 ): string {
 	return template
 		.replace(/\{\{body\}\}/g, body)
 		.replace(/\{\{unsubscribe_url\}\}/g, unsubscribeUrl)
 		.replace(/\{\{subject\}\}/g, subject || '')
-		.replace(/\{\{preheader\}\}/g, preheader || '');
+		.replace(/\{\{preheader\}\}/g, preheader || '')
+		.replace(/\{\{cta_url\}\}/g, ctaUrl || 'https://jellyjelly.com');
 }
 
 function sleep(ms: number): Promise<void> {
@@ -62,7 +65,7 @@ export async function sendCampaign(
 	siteUrl: string,
 	onProgress?: (progress: SendProgress) => void
 ): Promise<SendProgress> {
-	const { campaignId, subject, bodyHtml, templateHtml, batchSize = 50, delayMs = 1000, tags, sequenceId, sequenceStep, variantLabel } = config;
+	const { campaignId, subject, bodyHtml, templateHtml, batchSize = 50, delayMs = 1000, tags, sequenceId, sequenceStep, variantLabel, ctaUrl } = config;
 
 	// Build tags: explicit tags take priority, otherwise build from config fields
 	const resolvedTags: string[] = tags ? [...tags] : [`campaign-${campaignId}`];
@@ -91,7 +94,7 @@ export async function sendCampaign(
 			batch.map(async (recipient) => {
 				const token = createUnsubscribeToken(recipient.email, campaignId, unsubscribeSecret);
 				const unsubscribeUrl = `${siteUrl}/unsubscribe?token=${encodeURIComponent(token)}`;
-				const html = buildEmailHtml(templateHtml, bodyHtml, unsubscribeUrl, subject);
+				const html = buildEmailHtml(templateHtml, bodyHtml, unsubscribeUrl, subject, undefined, ctaUrl);
 
 				return mailgun.send({
 					to: recipient.email,

@@ -22,7 +22,7 @@
 
 	// Step 2: Generated emails state
 	let emails = $state<
-		{ subject: string; preheader: string; bodyHtml: string; templateName: string }[]
+		{ subject: string; preheader: string; bodyHtml: string; templateName: string; ctaUrl: string }[]
 	>([]);
 	let spacingDays = $state('7');
 	let startDate = $state('');
@@ -63,12 +63,12 @@
 	// Watch form results for generate action
 	$effect(() => {
 		if (form && 'emails' in form && form.emails) {
-			emails = form.emails as {
+			emails = (form.emails as {
 				subject: string;
 				preheader: string;
 				bodyHtml: string;
 				templateName: string;
-			}[];
+			}[]).map(e => ({ ...e, ctaUrl: '' }));
 			step = 2;
 			generating = false;
 		}
@@ -310,6 +310,18 @@
 						</div>
 
 						<div class="form-group">
+							<label for="email_{i}_ctaUrl">Button Link</label>
+							<input
+								id="email_{i}_ctaUrl"
+								name="email_{i + 1}_ctaUrl"
+								type="url"
+								bind:value={email.ctaUrl}
+								placeholder="https://jellyjelly.com"
+							/>
+							<span class="field-hint">CTA button URL (defaults to jellyjelly.com)</span>
+						</div>
+
+						<div class="form-group">
 							<label for="email_{i}_body">Body HTML</label>
 							<textarea
 								id="email_{i}_body"
@@ -509,6 +521,27 @@
 		font-weight: 600;
 		text-transform: uppercase;
 		letter-spacing: 0.5px;
+	}
+	input[type='url'] {
+		width: 100%;
+		padding: 12px 16px;
+		background: #111;
+		border: 1px solid #333;
+		border-radius: 10px;
+		color: #e0e0e0;
+		font-size: 14px;
+		font-family: inherit;
+		box-sizing: border-box;
+	}
+	input[type='url']:focus {
+		outline: none;
+		border-color: #4469B7;
+	}
+	.field-hint {
+		display: block;
+		margin-top: 6px;
+		font-size: 12px;
+		color: #666;
 	}
 	input[type='text'],
 	input[type='date'],

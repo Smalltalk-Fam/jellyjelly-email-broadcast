@@ -89,6 +89,7 @@ export const actions: Actions = {
 			const bodyHtml = formData.get(`email_${step}_bodyHtml`) as string;
 			const templateName = formData.get(`email_${step}_templateName`) as string;
 			const preheader = formData.get(`email_${step}_preheader`) as string;
+			const ctaUrl = (formData.get(`email_${step}_ctaUrl`) as string) || null;
 
 			const scheduledAt = startDate
 				? new Date(
@@ -102,6 +103,7 @@ export const actions: Actions = {
 				body_preview: bodyHtml?.replace(/<[^>]*>/g, '').slice(0, 200),
 				template_name: templateName || 'announcement',
 				preheader,
+				cta_url: ctaUrl,
 				sequence_id: sequence.id,
 				sequence_step: step,
 				scheduled_at: scheduledAt,
