@@ -5,7 +5,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <title>{{subject}}</title>
-  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
   <!--[if mso]>
   <noscript>
     <xml>
@@ -21,104 +20,105 @@
     img { -ms-interpolation-mode: bicubic; border: 0; height: auto; line-height: 100%; outline: none; text-decoration: none; }
     body { margin: 0; padding: 0; width: 100% !important; height: 100% !important; }
     @media screen and (max-width: 600px) {
-      .email-container { width: 100% !important; }
+      .email-container { width: 100% !important; max-width: 100% !important; }
       .heading { font-size: 36px !important; }
+      .content-pad { padding-left: 24px !important; padding-right: 24px !important; }
     }
     @media screen and (max-width: 480px) {
       .heading { font-size: 28px !important; }
-      .cta-button { display: block !important; width: 100% !important; text-align: center !important; }
-      .stack-column { display: block !important; width: 100% !important; }
+      .content-pad { padding-left: 16px !important; padding-right: 16px !important; }
     }
   </style>
 </head>
 <body style="margin:0; padding:0; background-color:#4469B7;">
   <span style="display:none !important; visibility:hidden; mso-hide:all; font-size:1px; line-height:1px; max-height:0; max-width:0; opacity:0; overflow:hidden;">{{preheader}}</span>
-  <center style="width:100%; background-color:#4469B7;">
-    <!--[if mso]><table role="presentation" cellspacing="0" cellpadding="0" border="0" width="600" align="center"><tr><td><![endif]-->
-    <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" class="email-container" style="margin:0 auto; max-width:600px;">
-      <!-- LOGO -->
-      <tr>
-        <td align="center" style="padding:30px 40px 20px; text-align:center;">
-          <img src="https://static1.jellyjelly.com/jelly-logo-white.png" width="56" height="56" alt="JellyJelly" style="display:block; margin:0 auto;">
-        </td>
-      </tr>
 
-      <!-- HEADING -->
-      <tr>
-        <td align="center" style="padding:10px 40px 20px; text-align:center;">
-          <h1 class="heading" style="margin:0; font-family:Roboto, Helvetica, 'Helvetica Neue', Arial, sans-serif; font-size:48px; font-weight:700; text-transform:uppercase; letter-spacing:-1px; line-height:0.8; color:#ffffff;">
-            <span style="display:block;">THIS WEEK</span>
-            <span style="display:block;">ON JELLYJELLY</span>
-          </h1>
-        </td>
-      </tr>
+  <!-- OUTER WRAPPER — full-width blue background -->
+  <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="background-color:#4469B7;">
+    <tr>
+      <td align="center" valign="top">
 
-      <!-- DIVIDER -->
-      <tr>
-        <td style="padding:0 40px;">
-          <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%">
-            <tr>
-              <td style="border-bottom:1px solid rgba(255,255,255,0.15);"></td>
-            </tr>
-          </table>
-        </td>
-      </tr>
+        <!-- INNER CONTAINER — fixed 600px, centered -->
+        <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="600" class="email-container" style="max-width:600px;">
 
-      <!-- BODY -->
-      <tr>
-        <td align="center" style="padding:30px 40px; font-family:Roboto, Helvetica, 'Helvetica Neue', Arial, sans-serif; font-size:16px; line-height:1.6; color:#ffffff; text-align:center;">
-          {{body}}
-        </td>
-      </tr>
+          <!-- LOGO -->
+          <tr>
+            <td align="center" class="content-pad" style="padding:30px 40px 20px;">
+              <img src="https://static1.jellyjelly.com/jelly-logo-white.png" width="56" height="56" alt="JellyJelly" style="display:block; margin:0 auto;">
+            </td>
+          </tr>
 
-      <!-- DIVIDER -->
-      <tr>
-        <td style="padding:0 40px;">
-          <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%">
-            <tr>
-              <td style="border-bottom:1px solid rgba(255,255,255,0.15);"></td>
-            </tr>
-          </table>
-        </td>
-      </tr>
+          <!-- HEADING -->
+          <tr>
+            <td align="center" class="content-pad" style="padding:10px 40px 20px;">
+              <h1 class="heading" style="margin:0; font-family:Roboto, Helvetica, 'Helvetica Neue', Arial, sans-serif; font-size:48px; font-weight:700; text-transform:uppercase; letter-spacing:-1px; line-height:0.8; color:#ffffff;">
+                <span style="display:block;">THIS WEEK</span>
+                <span style="display:block;">ON JELLYJELLY</span>
+              </h1>
+            </td>
+          </tr>
 
-      <!-- NOTE -->
-      <tr>
-        <td align="center" style="padding:20px 40px 10px; font-family:Roboto, Helvetica, 'Helvetica Neue', Arial, sans-serif; font-size:13px; line-height:1.5; color:rgba(255,255,255,0.6); text-align:center;">
-          Curated highlights from the JellyJelly community this week.
-        </td>
-      </tr>
+          <!-- DIVIDER -->
+          <tr>
+            <td class="content-pad" style="padding:0 40px;">
+              <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%">
+                <tr><td style="border-bottom:1px solid rgba(255,255,255,0.15); font-size:1px; line-height:1px;">&nbsp;</td></tr>
+              </table>
+            </td>
+          </tr>
 
-      <!-- CTA — bulletproof centered button (Gmail, Yahoo, Outlook, mobile) -->
-      <tr>
-        <td align="center" valign="top" style="padding:10px 40px 40px; text-align:center;">
-          <!--[if mso]>
-          <v:roundrect xmlns:v="urn:schemas-microsoft-com:vml" xmlns:w="urn:schemas-microsoft-com:office:word" href="{{cta_url}}" style="height:52px;v-text-anchor:middle;width:260px;" arcsize="50%" fillcolor="#89A9F4" stroke="f">
-            <w:anchorlock/>
-            <center style="color:#ffffff;font-family:Roboto,Helvetica,Arial,sans-serif;font-size:16px;font-weight:bold;text-transform:uppercase;">OPEN JELLYJELLY</center>
-          </v:roundrect>
-          <![endif]-->
-          <!--[if !mso]><!-->
-          <table role="presentation" cellspacing="0" cellpadding="0" border="0" align="center" style="margin:0 auto;">
-            <tr>
-              <td align="center" bgcolor="#89A9F4" style="background:#89A9F4; border-radius:999px; text-align:center;">
-                <a href="{{cta_url}}" class="cta-button" style="background:#89A9F4; border-radius:999px; text-transform:uppercase; font-weight:700; padding:16px 40px; color:#ffffff; text-decoration:none; display:block; text-align:center; font-family:Roboto, Helvetica, 'Helvetica Neue', Arial, sans-serif; font-size:16px;">OPEN JELLYJELLY</a>
-              </td>
-            </tr>
-          </table>
-          <!--<![endif]-->
-        </td>
-      </tr>
+          <!-- BODY CONTENT -->
+          <tr>
+            <td align="center" class="content-pad" style="padding:30px 40px; font-family:Roboto, Helvetica, 'Helvetica Neue', Arial, sans-serif; font-size:16px; line-height:1.6; color:#ffffff; text-align:center; word-break:break-word; overflow-wrap:break-word;">
+              {{body}}
+            </td>
+          </tr>
 
-      <!-- FOOTER -->
-      <tr>
-        <td align="center" style="padding:30px 40px; text-align:center; font-family:Roboto, Helvetica, Arial, sans-serif; font-size:12px; color:#aaaaaa; line-height:1.5;">
-          <a href="{{unsubscribe_url}}" style="color:#aaaaaa; text-decoration:underline;">Unsubscribe</a>
-          <br>JellyJelly Inc, 141 E Houston St, New York, NY 10002, US
-        </td>
-      </tr>
-    </table>
-    <!--[if mso]></td></tr></table><![endif]-->
-  </center>
+          <!-- DIVIDER -->
+          <tr>
+            <td class="content-pad" style="padding:0 40px;">
+              <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%">
+                <tr><td style="border-bottom:1px solid rgba(255,255,255,0.15); font-size:1px; line-height:1px;">&nbsp;</td></tr>
+              </table>
+            </td>
+          </tr>
+
+          <!-- NOTE -->
+          <tr>
+            <td align="center" class="content-pad" style="padding:20px 40px 10px; font-family:Roboto, Helvetica, 'Helvetica Neue', Arial, sans-serif; font-size:13px; line-height:1.5; color:rgba(255,255,255,0.6); text-align:center;">
+              Curated highlights from the JellyJelly community this week.
+            </td>
+          </tr>
+
+          <!-- CTA BUTTON -->
+          <tr>
+            <td align="center" style="padding:10px 40px 40px; text-align:center;">
+              <!--[if mso]>
+              <v:roundrect xmlns:v="urn:schemas-microsoft-com:vml" xmlns:w="urn:schemas-microsoft-com:office:word" href="{{cta_url}}" style="height:52px; v-text-anchor:middle; width:260px;" arcsize="50%" fillcolor="#89A9F4" stroke="f">
+                <w:anchorlock/>
+                <center style="color:#ffffff; font-family:Roboto,Helvetica,Arial,sans-serif; font-size:16px; font-weight:bold; text-transform:uppercase;">OPEN JELLYJELLY</center>
+              </v:roundrect>
+              <![endif]-->
+              <!--[if !mso]><!-->
+              <a href="{{cta_url}}" style="background-color:#89A9F4; border-radius:999px; text-transform:uppercase; font-weight:700; padding:16px 40px; color:#ffffff; text-decoration:none; display:inline-block; font-family:Roboto, Helvetica, 'Helvetica Neue', Arial, sans-serif; font-size:16px; mso-hide:all;">OPEN JELLYJELLY</a>
+              <!--<![endif]-->
+            </td>
+          </tr>
+
+          <!-- FOOTER -->
+          <tr>
+            <td align="center" style="padding:30px 40px; text-align:center; font-family:Roboto, Helvetica, Arial, sans-serif; font-size:12px; color:#aaaaaa; line-height:1.5;">
+              <a href="{{unsubscribe_url}}" style="color:#aaaaaa; text-decoration:underline;">Unsubscribe</a>
+              <br>JellyJelly Inc, 141 E Houston St, New York, NY 10002, US
+            </td>
+          </tr>
+
+        </table>
+        <!-- /INNER CONTAINER -->
+
+      </td>
+    </tr>
+  </table>
+  <!-- /OUTER WRAPPER -->
 </body>
 </html>
