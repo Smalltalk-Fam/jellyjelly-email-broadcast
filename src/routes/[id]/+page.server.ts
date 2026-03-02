@@ -4,6 +4,7 @@ import { error, fail } from '@sveltejs/kit';
 import { getSupabaseClient } from '$lib/server/supabase';
 import { createMailgunClient } from '$lib/email/mailgun';
 import { sendCampaign, splitRecipients, type Recipient } from '$lib/email/sender';
+import { twoProportionZTest, type SignificanceResult } from '$lib/stats';
 
 export const load: PageServerLoad = async ({ params }) => {
 	const supabase = getSupabaseClient();
@@ -46,7 +47,25 @@ export const load: PageServerLoad = async ({ params }) => {
 		}
 	}
 
-	return { campaign, variants: variants || [], eventCounts, variantEventCounts };
+	// Compute statistical significance for A/B variants
+	let significance: { opens: SignificanceResult; clicks: SignificanceResult } | null = null;
+	if (variants && variants.length >= 2) {
+		const vA = variants.find((v) => v.variant_label === 'A');
+		const vB = variants.find((v) => v.variant_label === 'B');
+		if (vA && vB) {
+			const countsA = variantEventCounts[vA.id] || {};
+			const countsB = variantEventCounts[vB.id] || {};
+			const delA = countsA['delivered'] || 0;
+			const delB = countsB['delivered'] || 0;
+
+			significance = {
+				opens: twoProportionZTest(countsA['opened'] || 0, delA, countsB['opened'] || 0, delB),
+				clicks: twoProportionZTest(countsA['clicked'] || 0, delA, countsB['clicked'] || 0, delB),
+			};
+		}
+	}
+
+	return { campaign, variants: variants || [], eventCounts, variantEventCounts, significance };
 };
 
 export const actions: Actions = {

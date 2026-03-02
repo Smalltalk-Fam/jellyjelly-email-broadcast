@@ -54,6 +54,29 @@
 
 	const openWinner = $derived(findWinner('opened'));
 	const clickWinner = $derived(findWinner('clicked'));
+
+	// Statistical significance
+	const sig = $derived(data.significance);
+
+	function formatPValue(p: number): string {
+		if (p < 0.001) return '< 0.001';
+		if (p < 0.01) return p.toFixed(3);
+		return p.toFixed(2);
+	}
+
+	function sigLabel(result: { significant: boolean; confidence: number; sampleSizeOk: boolean }): string {
+		if (!result.sampleSizeOk) return 'Need more data';
+		if (result.significant) return `Significant (${result.confidence}% confidence)`;
+		if (result.confidence === 90) return 'Trending (90% confidence)';
+		return 'Not significant';
+	}
+
+	function sigClass(result: { significant: boolean; confidence: number; sampleSizeOk: boolean }): string {
+		if (!result.sampleSizeOk) return 'sig-pending';
+		if (result.significant) return 'sig-yes';
+		if (result.confidence === 90) return 'sig-trending';
+		return 'sig-no';
+	}
 </script>
 
 <svelte:head>
@@ -205,7 +228,54 @@
 					</tbody>
 				</table>
 			</div>
-			<p class="ab-note">Statistical significance requires 100+ recipients per variant.</p>
+
+			<!-- Statistical Significance Panel -->
+			{#if sig}
+				<div class="sig-panel">
+					<h3>Statistical Significance</h3>
+					<p class="sig-method">Two-proportion z-test &middot; Two-tailed &middot; &alpha; = 0.05</p>
+
+					<div class="sig-grid">
+						<!-- Opens significance -->
+						<div class="sig-card">
+							<div class="sig-metric">Open Rate</div>
+							<div class="sig-badge {sigClass(sig.opens)}">{sigLabel(sig.opens)}</div>
+							{#if sig.opens.sampleSizeOk}
+								<div class="sig-details">
+									<span>p = {formatPValue(sig.opens.pValue)}</span>
+									<span>z = {sig.opens.zScore.toFixed(2)}</span>
+									{#if sig.opens.lift > 0 && sig.opens.winnerLabel !== '—'}
+										<span class="sig-lift">Variant {sig.opens.winnerLabel} +{sig.opens.lift}%</span>
+									{/if}
+								</div>
+							{:else}
+								<div class="sig-details">
+									<span>Need 30+ delivered per variant</span>
+								</div>
+							{/if}
+						</div>
+
+						<!-- Clicks significance -->
+						<div class="sig-card">
+							<div class="sig-metric">Click Rate</div>
+							<div class="sig-badge {sigClass(sig.clicks)}">{sigLabel(sig.clicks)}</div>
+							{#if sig.clicks.sampleSizeOk}
+								<div class="sig-details">
+									<span>p = {formatPValue(sig.clicks.pValue)}</span>
+									<span>z = {sig.clicks.zScore.toFixed(2)}</span>
+									{#if sig.clicks.lift > 0 && sig.clicks.winnerLabel !== '—'}
+										<span class="sig-lift">Variant {sig.clicks.winnerLabel} +{sig.clicks.lift}%</span>
+									{/if}
+								</div>
+							{:else}
+								<div class="sig-details">
+									<span>Need 30+ delivered per variant</span>
+								</div>
+							{/if}
+						</div>
+					</div>
+				</div>
+			{/if}
 		</section>
 	{/if}
 
@@ -388,11 +458,78 @@
 		color: #89a9f4;
 		font-weight: 600;
 	}
-	.ab-note {
-		margin-top: 12px;
-		font-size: 13px;
+	/* Statistical Significance Panel */
+	.sig-panel {
+		margin-top: 20px;
+		background: #12122a;
+		border: 1px solid #2a2a3e;
+		border-radius: 12px;
+		padding: 20px 24px;
+	}
+	.sig-panel h3 {
+		margin: 0 0 4px;
+		font-size: 15px;
+		color: #fff;
+		font-weight: 600;
+	}
+	.sig-method {
+		margin: 0 0 16px;
+		font-size: 12px;
 		color: #666;
-		font-style: italic;
+	}
+	.sig-grid {
+		display: grid;
+		grid-template-columns: 1fr 1fr;
+		gap: 16px;
+	}
+	.sig-card {
+		background: #1a1a2e;
+		border: 1px solid #2a2a3e;
+		border-radius: 10px;
+		padding: 16px;
+	}
+	.sig-metric {
+		font-size: 13px;
+		color: #888;
+		text-transform: uppercase;
+		font-weight: 600;
+		margin-bottom: 8px;
+	}
+	.sig-badge {
+		display: inline-block;
+		padding: 4px 12px;
+		border-radius: 6px;
+		font-size: 13px;
+		font-weight: 600;
+		margin-bottom: 10px;
+	}
+	.sig-yes {
+		background: #052e16;
+		color: #22c55e;
+	}
+	.sig-trending {
+		background: #422006;
+		color: #eab308;
+	}
+	.sig-no {
+		background: #1a1a2e;
+		color: #888;
+		border: 1px solid #333;
+	}
+	.sig-pending {
+		background: #1a1a2e;
+		color: #666;
+		border: 1px dashed #333;
+	}
+	.sig-details {
+		display: flex;
+		gap: 16px;
+		font-size: 13px;
+		color: #888;
+	}
+	.sig-lift {
+		color: #89a9f4;
+		font-weight: 600;
 	}
 
 	/* Send section */
