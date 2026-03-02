@@ -7,7 +7,8 @@
 		{ href: '/', label: 'Campaigns' },
 		{ href: '/sequences', label: 'Sequences' },
 		{ href: '/suppression', label: 'Suppressions' },
-		{ href: '/compose', label: 'New Campaign' }
+		{ href: '/compose', label: 'New Campaign' },
+		{ href: '/settings', label: 'Settings' }
 	];
 
 	function isActive(href: string, pathname: string): boolean {
