@@ -99,11 +99,16 @@ export const POST: RequestHandler = async ({ request, cookies }) => {
 	}
 
 	const mailgun = createMailgunClient(mailgunKey, mailgunDomain);
+
+	// Always fetch suppression list from Mailgun
+	const suppressedSet = await mailgun.getSuppressedEmails();
 	let recipients: Recipient[];
 
 	if (Array.isArray(testRecipients) && testRecipients.length > 0) {
-		// Test mode: send only to specified addresses
-		recipients = testRecipients.map((email: string) => ({ email, userId: 'test' }));
+		// Test/batch mode: send only to specified addresses, but still filter suppressions
+		recipients = testRecipients
+			.filter((email: string) => !suppressedSet.has(email.toLowerCase()))
+			.map((email: string) => ({ email, userId: 'test' }));
 	} else {
 		// Production: fetch all auth.users (paginated)
 		const allUsers: Recipient[] = [];
@@ -124,8 +129,6 @@ export const POST: RequestHandler = async ({ request, cookies }) => {
 			page++;
 		}
 
-		// Fetch suppression list from Mailgun
-		const suppressedSet = await mailgun.getSuppressedEmails();
 		recipients = allUsers.filter((u) => !suppressedSet.has(u.email.toLowerCase()));
 	}
 
