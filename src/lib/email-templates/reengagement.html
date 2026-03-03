@@ -4,6 +4,8 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="color-scheme" content="light dark">
+  <meta name="supported-color-schemes" content="light dark">
   <title>{{subject}}</title>
   <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
   <!--[if mso]>
@@ -16,6 +18,7 @@
   </noscript>
   <![endif]-->
   <style>
+    :root { color-scheme: light dark; supported-color-schemes: light dark; }
     body, table, td, a { -webkit-text-size-adjust: 100%; -ms-text-size-adjust: 100%; }
     table, td { mso-table-lspace: 0; mso-table-rspace: 0; }
     img { -ms-interpolation-mode: bicubic; border: 0; height: auto; line-height: 100%; outline: none; text-decoration: none; }
@@ -29,11 +32,23 @@
       .cta-button { display: block !important; width: 100% !important; text-align: center !important; }
       .stack-column { display: block !important; width: 100% !important; }
     }
+    /* Dark mode: prevent email clients from altering colors */
+    @media (prefers-color-scheme: dark) {
+      body { background-color: #4469B7 !important; }
+      .email-bg { background-color: #4469B7 !important; }
+      h1 { color: #ffffff !important; }
+      .email-body-text, .email-body-text td { color: #ffffff !important; }
+      .email-btn { background: #89A9F4 !important; color: #ffffff !important; }
+      .email-footer, .email-footer a { color: #aaaaaa !important; }
+    }
+    [data-ogsc] h1 { color: #ffffff !important; }
+    [data-ogsc] .email-body-text, [data-ogsc] .email-body-text td { color: #ffffff !important; }
+    [data-ogsc] .email-btn { background: #89A9F4 !important; color: #ffffff !important; }
   </style>
 </head>
-<body style="margin:0; padding:0; background-color:#4469B7;">
+<body class="email-bg" style="margin:0; padding:0; background-color:#4469B7;">
   <span style="display:none !important; visibility:hidden; mso-hide:all; font-size:1px; line-height:1px; max-height:0; max-width:0; opacity:0; overflow:hidden;">{{preheader}}</span>
-  <center style="width:100%; background-color:#4469B7;">
+  <center class="email-bg" style="width:100%; background-color:#4469B7;">
     <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="600" class="email-container" style="margin:0 auto; max-width:600px;">
       <!-- LOGO -->
       <tr>
@@ -66,7 +81,7 @@
 
       <!-- BODY -->
       <tr>
-        <td style="padding:30px 40px; font-family:Roboto, Helvetica, 'Helvetica Neue', Arial, sans-serif; font-size:16px; line-height:1.6; color:#ffffff; text-align:center;">
+        <td class="email-body-text" style="padding:30px 40px; font-family:Roboto, Helvetica, 'Helvetica Neue', Arial, sans-serif; font-size:16px; line-height:1.6; color:#ffffff; text-align:center;">
           {{body}}
         </td>
       </tr>
@@ -74,13 +89,13 @@
       <!-- CTA -->
       <tr>
         <td style="padding:10px 40px 40px; text-align:center;">
-          <a href="{{cta_url}}" class="cta-button" style="background:#89A9F4; border-radius:999px; text-transform:uppercase; font-weight:700; padding:16px 40px; color:#ffffff; text-decoration:none; display:inline-block; font-family:Roboto, Helvetica, 'Helvetica Neue', Arial, sans-serif; font-size:16px;">SEE WHAT'S NEW</a>
+          <a href="{{cta_url}}" class="cta-button email-btn" style="background:#89A9F4; border-radius:999px; text-transform:uppercase; font-weight:700; padding:16px 40px; color:#ffffff; text-decoration:none; display:inline-block; font-family:Roboto, Helvetica, 'Helvetica Neue', Arial, sans-serif; font-size:16px;">SEE WHAT'S NEW</a>
         </td>
       </tr>
 
       <!-- FOOTER -->
       <tr>
-        <td style="padding:30px 40px; text-align:center; font-family:Roboto, Helvetica, Arial, sans-serif; font-size:12px; color:#aaaaaa; line-height:1.5;">
+        <td class="email-footer" style="padding:30px 40px; text-align:center; font-family:Roboto, Helvetica, Arial, sans-serif; font-size:12px; color:#aaaaaa; line-height:1.5;">
           <a href="{{unsubscribe_url}}" style="color:#aaaaaa; text-decoration:underline;">Unsubscribe</a>
           <br>JellyJelly Inc, 141 E Houston St, New York, NY 10002, US
         </td>
