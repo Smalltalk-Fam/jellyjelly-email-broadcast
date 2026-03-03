@@ -61,9 +61,11 @@ export function createMailgunClient(apiKey: string, domain: string) {
 			}
 		}
 
-		// Tracking
+		// Tracking — open tracking only; click tracking disabled because Mailgun
+		// wraps links in tracking redirects (email.jellyjelly.com/c/...) which
+		// breaks iOS Universal Links (app won't open from redirected URLs)
 		formData.append('o:tracking', 'yes');
-		formData.append('o:tracking-clicks', 'yes');
+		formData.append('o:tracking-clicks', 'no');
 		formData.append('o:tracking-opens', 'yes');
 
 		try {
