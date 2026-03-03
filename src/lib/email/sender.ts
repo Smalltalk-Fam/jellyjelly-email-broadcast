@@ -100,6 +100,18 @@ export function buildEmailHtml(
 			: 'https://static1.jellyjelly.com/jelly-logo-white.png');
 }
 
+/** Append utm_source to all href links in the final HTML, skipping unsubscribe/mailto */
+export function appendUtmSource(html: string, tag: string): string {
+	return html.replace(
+		/href="(https?:\/\/[^"]+)"/gi,
+		(match, url: string) => {
+			if (url.includes('/unsubscribe') || url.startsWith('mailto:')) return match;
+			const sep = url.includes('?') ? '&' : '?';
+			return `href="${url}${sep}utm_source=${encodeURIComponent(tag)}"`;
+		}
+	);
+}
+
 function sleep(ms: number): Promise<void> {
 	return new Promise((resolve) => setTimeout(resolve, ms));
 }
@@ -142,7 +154,8 @@ export async function sendCampaign(
 			batch.map(async (recipient) => {
 				const token = createUnsubscribeToken(recipient.email, campaignId, unsubscribeSecret);
 				const unsubscribeUrl = `${siteUrl}/unsubscribe?token=${encodeURIComponent(token)}`;
-				const html = buildEmailHtml(templateHtml, bodyHtml, unsubscribeUrl, subject, preheader, ctaUrl, bgColor, cardColor, btnColor, headingColor, bodyColor);
+				const rawHtml = buildEmailHtml(templateHtml, bodyHtml, unsubscribeUrl, subject, preheader, ctaUrl, bgColor, cardColor, btnColor, headingColor, bodyColor);
+				const html = appendUtmSource(rawHtml, resolvedTags[0] || `campaign-${campaignId}`);
 
 				return mailgun.send({
 					to: recipient.email,
