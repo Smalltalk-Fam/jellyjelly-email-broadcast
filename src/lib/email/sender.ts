@@ -100,14 +100,17 @@ export function buildEmailHtml(
 			: 'https://static1.jellyjelly.com/jelly-logo-white.png');
 }
 
-/** Append utm_source to all href links in the final HTML, skipping unsubscribe/mailto */
+/** Append utm_source to anchor href links only, skipping <link>, <img>, unsubscribe, and mailto */
 export function appendUtmSource(html: string, tag: string): string {
 	return html.replace(
-		/href="(https?:\/\/[^"]+)"/gi,
-		(match, url: string) => {
-			if (url.includes('/unsubscribe') || url.startsWith('mailto:')) return match;
+		/<a\s[^>]*href="(https?:\/\/[^"]+)"[^>]*>/gi,
+		(aTag, url: string) => {
+			if (url.includes('/unsubscribe') || url.startsWith('mailto:')) return aTag;
 			const sep = url.includes('?') ? '&' : '?';
-			return `href="${url}${sep}utm_source=${encodeURIComponent(tag)}"`;
+			return aTag.replace(
+				`href="${url}"`,
+				`href="${url}${sep}utm_source=${encodeURIComponent(tag)}"`
+			);
 		}
 	);
 }
