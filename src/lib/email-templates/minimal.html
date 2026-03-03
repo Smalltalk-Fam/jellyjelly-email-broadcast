@@ -45,8 +45,10 @@
 </head>
 <body class="email-bg" style="margin:0; padding:0; background-color:#4469B7;">
   <span style="display:none !important; visibility:hidden; mso-hide:all; font-size:1px; line-height:1px; max-height:0; max-width:0; opacity:0; overflow:hidden;">{{preheader}}</span>
-  <center class="email-bg" style="width:100%; background-color:#4469B7;">
-    <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="600" class="email-container" style="margin:0 auto; max-width:600px;">
+  <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="background-color:{{bg_color}};" class="email-bg">
+    <tr>
+      <td align="center" valign="top">
+    <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="600" class="email-container" style="max-width:600px;">
       <!-- LOGO -->
       <tr>
         <td style="padding:30px 40px 20px; text-align:center;">
@@ -70,12 +72,14 @@
 
       <!-- FOOTER -->
       <tr>
-        <td class="email-footer" style="padding:30px 40px; text-align:center; font-family:Roboto, Helvetica, Arial, sans-serif; font-size:12px; color:#aaaaaa; line-height:1.5;">
+        <td align="center" class="email-footer" style="padding:30px 40px; text-align:center; font-family:Roboto, Helvetica, Arial, sans-serif; font-size:12px; color:#aaaaaa; line-height:1.5;">
           <a href="{{unsubscribe_url}}" style="color:#aaaaaa; text-decoration:underline;">Unsubscribe</a>
           <br>JellyJelly Inc, 141 E Houston St, New York, NY 10002, US
         </td>
       </tr>
-    </table>
-  </center>
+      </table>
+      </td>
+    </tr>
+  </table>
 </body>
 </html>
