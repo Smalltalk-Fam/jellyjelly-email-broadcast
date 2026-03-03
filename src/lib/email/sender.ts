@@ -157,8 +157,7 @@ export async function sendCampaign(
 			batch.map(async (recipient) => {
 				const token = createUnsubscribeToken(recipient.email, campaignId, unsubscribeSecret);
 				const unsubscribeUrl = `${siteUrl}/unsubscribe?token=${encodeURIComponent(token)}`;
-				const rawHtml = buildEmailHtml(templateHtml, bodyHtml, unsubscribeUrl, subject, preheader, ctaUrl, bgColor, cardColor, btnColor, headingColor, bodyColor);
-				const html = appendUtmSource(rawHtml, resolvedTags[0] || `campaign-${campaignId}`);
+				const html = buildEmailHtml(templateHtml, bodyHtml, unsubscribeUrl, subject, preheader, ctaUrl, bgColor, cardColor, btnColor, headingColor, bodyColor);
 
 				return mailgun.send({
 					to: recipient.email,
