@@ -196,7 +196,12 @@ export const actions: Actions = {
 					bodyHtml: variantA.body_html,
 					templateHtml: templateA,
 					tags: ['campaign', `campaign-${campaign.id}`, 'variant-A'],
-					ctaUrl: variantA.cta_url || campaign.cta_url
+					ctaUrl: variantA.cta_url || campaign.cta_url,
+					bgColor: variantA.bg_color || campaign.bg_color,
+					cardColor: variantA.card_color || campaign.card_color,
+					btnColor: variantA.btn_color || campaign.btn_color,
+					headingColor: variantA.heading_color || campaign.heading_color,
+					bodyColor: variantA.body_color || campaign.body_color
 				},
 				unsubscribeSecret,
 				siteUrl
@@ -222,7 +227,12 @@ export const actions: Actions = {
 					bodyHtml: variantB.body_html,
 					templateHtml: templateB,
 					tags: ['campaign', `campaign-${campaign.id}`, 'variant-B'],
-					ctaUrl: variantB.cta_url || campaign.cta_url
+					ctaUrl: variantB.cta_url || campaign.cta_url,
+					bgColor: variantB.bg_color || campaign.bg_color,
+					cardColor: variantB.card_color || campaign.card_color,
+					btnColor: variantB.btn_color || campaign.btn_color,
+					headingColor: variantB.heading_color || campaign.heading_color,
+					bodyColor: variantB.body_color || campaign.body_color
 				},
 				unsubscribeSecret,
 				siteUrl
@@ -251,7 +261,12 @@ export const actions: Actions = {
 					bodyHtml: campaign.body_html,
 					templateHtml,
 					tags: ['campaign', `campaign-${campaign.id}`],
-					ctaUrl: campaign.cta_url
+					ctaUrl: campaign.cta_url,
+					bgColor: campaign.bg_color,
+					cardColor: campaign.card_color,
+					btnColor: campaign.btn_color,
+					headingColor: campaign.heading_color,
+					bodyColor: campaign.body_color
 				},
 				unsubscribeSecret,
 				siteUrl,

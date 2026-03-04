@@ -36,6 +36,7 @@ export const POST: RequestHandler = async ({ request, cookies }) => {
 		siteUrl = 'https://jellyjelly.com',
 		ctaUrl,
 		bgColor,
+		cardColor,
 		btnColor,
 		headingColor,
 		bodyColor,
@@ -61,6 +62,7 @@ export const POST: RequestHandler = async ({ request, cookies }) => {
 				preheader: preheader || null,
 				cta_url: ctaUrl || null,
 				bg_color: bgColor || null,
+				card_color: cardColor || null,
 				btn_color: btnColor || null,
 				heading_color: headingColor || null,
 				body_color: bodyColor || null,
@@ -142,7 +144,7 @@ export const POST: RequestHandler = async ({ request, cookies }) => {
 	const result = await sendCampaign(
 		mailgun,
 		recipients,
-		{ campaignId, subject, bodyHtml, templateHtml, preheader, ctaUrl, bgColor, btnColor, headingColor, bodyColor },
+		{ campaignId, subject, bodyHtml, templateHtml, preheader, ctaUrl, bgColor, cardColor, btnColor, headingColor, bodyColor },
 		unsubscribeSecret,
 		siteUrl,
 		async (progress) => {
