@@ -77,7 +77,13 @@
           <!-- LOGO -->
           <tr>
             <td align="center" class="content-pad" style="padding:30px 40px 20px;">
-              <img src="{{logo_src}}" width="56" height="56" alt="JellyJelly" style="display:block; margin:0 auto;">
+              <table role="presentation" cellspacing="0" cellpadding="0" border="0" align="center">
+                <tr>
+                  <td>
+                    <img src="{{logo_src}}" width="56" height="56" alt="JellyJelly" style="display:block; margin:0 auto;">
+                  </td>
+                </tr>
+              </table>
             </td>
           </tr>
 
@@ -125,16 +131,22 @@
 
           <!-- CTA BUTTON -->
           <tr>
-            <td align="center" style="padding:10px 40px 40px; text-align:center;">
+            <td align="center" style="padding:10px 40px 40px;">
               <!--[if mso]>
-                          <v:roundrect xmlns:v="urn:schemas-microsoft-com:vml" xmlns:w="urn:schemas-microsoft-com:office:word" href="{{cta_url}}" style="height:52px; v-text-anchor:middle; width:260px;" arcsize="50%" fillcolor="{{btn_color}}" stroke="f">
-                            <w:anchorlock/>
-                            <center style="color:{{btn_text_color}}; font-family:Roboto,Helvetica,Arial,sans-serif; font-size:16px; font-weight:bold; text-transform:uppercase;">OPEN JELLYJELLY</center>
-                          </v:roundrect>
-                          <![endif]-->
+              <v:roundrect xmlns:v="urn:schemas-microsoft-com:vml" xmlns:w="urn:schemas-microsoft-com:office:word" href="{{cta_url}}" style="height:52px; v-text-anchor:middle; width:260px;" arcsize="50%" fillcolor="{{btn_color}}" stroke="f">
+                <w:anchorlock/>
+                <center style="color:{{btn_text_color}}; font-family:Roboto,Helvetica,Arial,sans-serif; font-size:16px; font-weight:bold; text-transform:uppercase;">OPEN JELLYJELLY</center>
+              </v:roundrect>
+              <![endif]-->
               <!--[if !mso]><!-->
-                          <a href="{{cta_url}}" class="email-btn" style="background:{{btn_color}}; border-radius:999px; text-transform:uppercase; font-weight:700; padding:16px 40px; color:{{btn_text_color}}; text-decoration:none; display:inline-block; font-family:'Outfit', 'Helvetica Neue', Arial, sans-serif; font-size:16px; letter-spacing:0.04em; mso-padding-alt:0;">OPEN JELLYJELLY</a>
-                          <!--<![endif]-->
+              <table role="presentation" cellspacing="0" cellpadding="0" border="0" align="center">
+                <tr>
+                  <td>
+                    <a href="{{cta_url}}" class="email-btn" style="background:{{btn_color}}; border-radius:999px; text-transform:uppercase; font-weight:700; padding:16px 40px; color:{{btn_text_color}}; text-decoration:none; display:inline-block; font-family:'Outfit', 'Helvetica Neue', Arial, sans-serif; font-size:16px; letter-spacing:0.04em; mso-padding-alt:0;">OPEN JELLYJELLY</a>
+                  </td>
+                </tr>
+              </table>
+              <!--<![endif]-->
             </td>
           </tr>
 
