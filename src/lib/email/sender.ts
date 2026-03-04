@@ -160,11 +160,12 @@ export async function sendCampaign(
 				const token = createUnsubscribeToken(recipient.email, campaignId, unsubscribeSecret);
 				const unsubscribeUrl = `${siteUrl}/unsubscribe?token=${encodeURIComponent(token)}`;
 				const html = buildEmailHtml(templateHtml, bodyHtml, unsubscribeUrl, subject, preheader, ctaUrl, bgColor, cardColor, btnColor, headingColor, bodyColor);
+				const trackedHtml = appendUtmSource(html, `campaign-${campaignId}`);
 
 				return mailgun.send({
 					to: recipient.email,
 					subject,
-					html,
+					html: trackedHtml,
 					tags: resolvedTags,
 					headers: {
 						'List-Unsubscribe': `<${unsubscribeUrl}>`,
