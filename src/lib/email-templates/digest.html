@@ -1,240 +1,157 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml" xmlns:v="urn:schemas-microsoft-com:vml" xmlns:o="urn:schemas-microsoft-com:office:office">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{{subject}}</title>
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;600;700&display=swap" rel="stylesheet">
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="color-scheme" content="light dark">
+  <meta name="supported-color-schemes" content="light dark">
+  <title>{{subject}}</title>
+  <!--[if mso]>
+  <noscript>
+    <xml>
+      <o:OfficeDocumentSettings>
+        <o:PixelsPerInch>96</o:PixelsPerInch>
+      </o:OfficeDocumentSettings>
+    </xml>
+  </noscript>
+  <![endif]-->
+  <style>
+    :root { color-scheme: light dark; supported-color-schemes: light dark; }
+    body, table, td, a { -webkit-text-size-adjust: 100%; -ms-text-size-adjust: 100%; }
+    table, td { mso-table-lspace: 0; mso-table-rspace: 0; }
+    img { -ms-interpolation-mode: bicubic; border: 0; height: auto; line-height: 100%; outline: none; text-decoration: none; }
+    body { margin: 0; padding: 0; width: 100% !important; height: 100% !important; }
 
-        body {
-            font-family: 'Roboto', -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif;
-            background-color: {{bg_color}};
-            color: {{body_color}};
-            line-height: 1.5;
-        }
+    /* Dark mode: re-assert exact light-mode colors to prevent auto-inversion */
+    @media (prefers-color-scheme: dark) {
+      body, .email-bg { background-color: {{bg_color}} !important; }
+      .email-bg-inner { background-color: {{bg_color}} !important; }
+      h1, .email-heading { color: {{heading_color}} !important; }
+      .email-body-text, .email-body-text td, .email-body-text p, .email-body-text span { color: {{body_color}} !important; }
+      .email-note { color: {{body_color}} !important; opacity: 0.6; }
+      .email-btn { background-color: {{btn_color}} !important; color: {{btn_text_color}} !important; }
+      .email-footer, .email-footer a { color: #aaaaaa !important; }
+      /* Digest body content */
+      .digest-card { background-color: #000000 !important; border-color: #222222 !important; }
+      .digest-card td { color: #F5F0EB !important; }
+      .digest-card a { color: #F5F0EB !important; }
+      .digest-stats { background-color: #000000 !important; border-color: #222222 !important; color: #F5F0EB !important; }
+      .digest-text { color: #F5F0EB !important; }
+      .digest-link { color: #F5F0EB !important; }
+      .digest-quote-bar { background-color: #F5F0EB !important; }
+    }
+    /* Outlook iOS/Android dark mode */
+    [data-ogsc] .email-bg { background-color: {{bg_color}} !important; }
+    [data-ogsc] h1, [data-ogsc] .email-heading { color: {{heading_color}} !important; }
+    [data-ogsc] .email-body-text, [data-ogsc] .email-body-text td { color: {{body_color}} !important; }
+    [data-ogsc] .email-btn { background-color: {{btn_color}} !important; color: {{btn_text_color}} !important; }
+    [data-ogsc] .digest-card { background-color: #000000 !important; }
+    [data-ogsc] .digest-card td, [data-ogsc] .digest-card a { color: #F5F0EB !important; }
+    [data-ogsc] .digest-stats { background-color: #000000 !important; color: #F5F0EB !important; }
+    [data-ogsc] .digest-text { color: #F5F0EB !important; }
+    [data-ogsc] .digest-quote-bar { background-color: #F5F0EB !important; }
 
-        a {
-            color: {{body_color}};
-            text-decoration: none;
-        }
-
-        a img {
-            border: 0;
-            outline: none;
-        }
-
-        .email-container {
-            max-width: 600px;
-            width: 100%;
-            margin: 0 auto;
-            background-color: {{bg_color}};
-            padding: 0;
-        }
-
-        .header-logo {
-            padding: 30px 30px 5px;
-            text-align: left;
-        }
-
-        .header-logo img {
-            width: 56px;
-            height: 56px;
-        }
-
-        .content {
-            padding: 5px 30px 40px;
-            min-width: 320px;
-        }
-
-        .main-heading {
-            font-family: 'Helvetica', 'Helvetica Neue', sans-serif;
-            font-size: 48px;
-            font-weight: 700;
-            text-align: left;
-            color: {{heading_color}};
-            line-height: 0.8;
-            margin: 15px 0 20px;
-            letter-spacing: -1px;
-        }
-
-        .main-heading .line {
-            display: block;
-            padding: 5px;
-        }
-
-        .body-text {
-            font-family: 'Helvetica', 'Helvetica Neue', sans-serif;
-            font-size: 16px;
-            color: {{body_color}};
-            text-align: left;
-            margin: 10px 0;
-            line-height: 1.6;
-        }
-
-        .body-text a {
-            color: {{body_color}};
-            text-decoration: underline;
-        }
-
-        .body-text p {
-            margin: 0 0 16px;
-        }
-
-        .body-text img {
-            display: block;
-            max-width: 100%;
-            height: auto;
-            border-radius: 8px;
-            margin: 16px 0;
-        }
-
-        .digest-card {
-            background-color: #000000;
-            border: 1px solid #222222;
-            border-radius: 8px;
-            padding: 16px;
-            margin-bottom: 16px;
-        }
-
-        .digest-card td {
-            color: #F5F0EB;
-        }
-
-        .digest-card a {
-            color: #F5F0EB;
-        }
-
-        .digest-stats {
-            background-color: #000000;
-            border: 1px solid #222222;
-            border-radius: 8px;
-            padding: 16px;
-            text-align: center;
-            color: #F5F0EB;
-        }
-
-        .cta-button {
-            display: block;
-            background-color: {{btn_color}};
-            color: {{btn_text_color}};
-            text-decoration: none;
-            padding: 16px 32px;
-            border-radius: 999px;
-            font-weight: 600;
-            font-size: 16px;
-            margin: 40px 0;
-            text-align: center;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            width: 100%;
-            box-sizing: border-box;
-        }
-
-        .cta-button:hover {
-            opacity: 0.9;
-        }
-
-        .jelly-title {
-            font-family: 'Roboto', sans-serif;
-            font-size: 14px;
-            color: {{body_color}};
-            text-align: left;
-            margin-top: 12px;
-            font-weight: 400;
-            text-decoration: none;
-            display: block;
-        }
-
-        @media only screen and (max-width: 600px) {
-            body {
-                padding: 0;
-                margin: 0;
-            }
-
-            .email-container {
-                width: 100% !important;
-                max-width: 100% !important;
-                padding: 0;
-                margin: 0 auto;
-            }
-
-            .content {
-                padding: 10px 20px 30px;
-                min-width: 320px;
-            }
-
-            .main-heading {
-                font-size: 32px;
-                margin: 20px 0 15px;
-                line-height: 1.1;
-            }
-
-            .body-text {
-                font-size: 14px;
-                margin: 8px 0;
-            }
-
-            .cta-button {
-                width: 100%;
-                margin: 30px 0;
-                padding: 14px 24px;
-                font-size: 14px;
-            }
-        }
-
-        @media only screen and (max-width: 480px) {
-            .main-heading {
-                font-size: 28px;
-            }
-
-            .body-text {
-                font-size: 13px;
-            }
-
-            .cta-button {
-                font-size: 13px;
-                padding: 12px 20px;
-            }
-        }
-    </style>
+    @media screen and (max-width: 600px) {
+      .email-container { width: 100% !important; max-width: 100% !important; }
+      .heading { font-size: 36px !important; }
+      .content-pad { padding-left: 24px !important; padding-right: 24px !important; }
+    }
+    @media screen and (max-width: 480px) {
+      .heading { font-size: 28px !important; }
+      .content-pad { padding-left: 16px !important; padding-right: 16px !important; }
+    }
+  </style>
 </head>
-<body>
-<span style="display:none !important; visibility:hidden; mso-hide:all; font-size:1px; line-height:1px; max-height:0; max-width:0; opacity:0; overflow:hidden;">{{preheader}}</span>
-<div class="email-container">
-    <div class="header-logo">
-        <a href="https://www.jellyjelly.com" target="_blank">
-            <img src="{{logo_src}}" alt="Jelly Logo">
-        </a>
-    </div>
+<body style="margin:0; padding:0; background-color:{{bg_color}};" class="email-bg">
+  <span style="display:none !important; visibility:hidden; mso-hide:all; font-size:1px; line-height:1px; max-height:0; max-width:0; opacity:0; overflow:hidden;">{{preheader}}</span>
 
-    <div class="content">
-        <h1 class="main-heading">
-            <span class="line">THIS WEEK</span>
-            <span class="line">ON JELLYJELLY</span>
-        </h1>
+  <!-- OUTER WRAPPER — full-width background -->
+  <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="background-color:{{bg_color}};" class="email-bg-inner">
+    <tr>
+      <td align="center" valign="top">
 
-        <div class="body-text">
-            {{body}}
-        </div>
+        <!-- INNER CONTAINER — fixed 600px, centered -->
+        <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="600" class="email-container" style="max-width:600px;">
 
-        <a href="{{cta_url}}" class="cta-button">OPEN JELLYJELLY</a>
-    </div>
-</div>
+          <!-- LOGO -->
+          <tr>
+            <td align="left" class="content-pad" style="padding:30px 40px 20px;">
+              <img src="{{logo_src}}" width="56" height="56" alt="JellyJelly" style="display:block;">
+            </td>
+          </tr>
 
-<div class="email-container" align="center" style="padding: 30px;">
-    <p style="color: #dfdfdf; font-size: 12px; margin: 0 0 10px 0;">
-        &copy; 2026 JellyJelly
-    </p>
-    <p style="color: #aaaaaa; font-size: 12px; margin: 0;">
-        <a href="{{unsubscribe_url}}" style="color: #aaaaaa; text-decoration: underline;">Unsubscribe</a>
-    </p>
-</div>
+          <!-- HEADING -->
+          <tr>
+            <td align="center" class="content-pad" style="padding:10px 40px 20px;">
+              <h1 class="heading email-heading" style="margin:0; font-family:Roboto, Helvetica, 'Helvetica Neue', Arial, sans-serif; font-size:48px; font-weight:700; text-transform:uppercase; letter-spacing:-1px; line-height:0.8; color:{{heading_color}};">
+                <span style="display:block;">THIS WEEK</span>
+                <span style="display:block;">ON JELLYJELLY</span>
+              </h1>
+            </td>
+          </tr>
 
+          <!-- DIVIDER -->
+          <tr>
+            <td class="content-pad" style="padding:0 40px;">
+              <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%">
+                <tr><td style="border-bottom:1px solid rgba(255,255,255,0.15); font-size:1px; line-height:1px;">&nbsp;</td></tr>
+              </table>
+            </td>
+          </tr>
+
+          <!-- BODY CONTENT -->
+          <tr>
+            <td align="center" class="content-pad email-body-text" style="padding:30px 40px; font-family:Roboto, Helvetica, 'Helvetica Neue', Arial, sans-serif; font-size:16px; line-height:1.6; color:{{body_color}}; text-align:center; word-break:break-word; overflow-wrap:break-word;">
+              {{body}}
+            </td>
+          </tr>
+
+          <!-- DIVIDER -->
+          <tr>
+            <td class="content-pad" style="padding:0 40px;">
+              <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%">
+                <tr><td style="border-bottom:1px solid rgba(255,255,255,0.15); font-size:1px; line-height:1px;">&nbsp;</td></tr>
+              </table>
+            </td>
+          </tr>
+
+          <!-- NOTE -->
+          <tr>
+            <td align="center" class="content-pad email-note" style="padding:20px 40px 10px; font-family:Roboto, Helvetica, 'Helvetica Neue', Arial, sans-serif; font-size:13px; line-height:1.5; color:rgba(255,255,255,0.6); text-align:center;">
+              Curated highlights from the JellyJelly community this week.
+            </td>
+          </tr>
+
+          <!-- CTA BUTTON -->
+          <tr>
+            <td align="center" style="padding:10px 40px 40px; text-align:center;">
+              <!--[if mso]>
+                          <v:roundrect xmlns:v="urn:schemas-microsoft-com:vml" xmlns:w="urn:schemas-microsoft-com:office:word" href="{{cta_url}}" style="height:52px; v-text-anchor:middle; width:260px;" arcsize="50%" fillcolor="{{btn_color}}" stroke="f">
+                            <w:anchorlock/>
+                            <center style="color:{{btn_text_color}}; font-family:Roboto,Helvetica,Arial,sans-serif; font-size:16px; font-weight:bold; text-transform:uppercase;">OPEN JELLYJELLY</center>
+                          </v:roundrect>
+                          <![endif]-->
+              <!--[if !mso]><!-->
+                          <a href="{{cta_url}}" class="email-btn" style="background:{{btn_color}}; border-radius:999px; text-transform:uppercase; font-weight:700; padding:16px 40px; color:{{btn_text_color}}; text-decoration:none; display:inline-block; font-family:'Outfit', 'Helvetica Neue', Arial, sans-serif; font-size:16px; letter-spacing:0.04em; mso-padding-alt:0;">OPEN JELLYJELLY</a>
+                          <!--<![endif]-->
+            </td>
+          </tr>
+
+          <!-- FOOTER -->
+          <tr>
+            <td align="center" class="email-footer" style="padding:30px 40px; text-align:center; font-family:Roboto, Helvetica, Arial, sans-serif; font-size:12px; color:#aaaaaa; line-height:1.5;">
+              <a href="{{unsubscribe_url}}" style="color:#aaaaaa; text-decoration:underline;">Unsubscribe</a>
+              <br>JellyJelly Inc, 141 E Houston St, New York, NY 10002, US
+            </td>
+          </tr>
+
+        </table>
+        <!-- /INNER CONTAINER -->
+
+      </td>
+    </tr>
+  </table>
+  <!-- /OUTER WRAPPER -->
 </body>
 </html>
